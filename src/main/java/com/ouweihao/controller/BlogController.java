@@ -38,6 +38,9 @@ public class BlogController {
     public String blogs(@RequestParam(required = false,defaultValue = "1",value = "pagenum")int pagenum, Model model){
         PageHelper.startPage(pagenum, 5);
         List<Blog> allBlog = blogService.getAllBlog();
+        for (Blog blog : allBlog) {
+            System.out.println(blog);
+        }
         //得到分页结果对象
         PageInfo pageInfo = new PageInfo(allBlog);
         model.addAttribute("pageInfo", pageInfo);
@@ -48,7 +51,11 @@ public class BlogController {
     @PostMapping("/blogs/search")  //按条件查询博客
     public String searchBlogs(Blog blog, @RequestParam(required = false,defaultValue = "1",value = "pagenum")int pagenum, Model model){
         PageHelper.startPage(pagenum, 5);
+//        System.out.println("blog" + blog);
         List<Blog> allBlog = blogService.searchAllBlog(blog);
+//        for (Blog b : allBlog) {
+//            System.out.println(b);
+//        }
         //得到分页结果对象
         PageInfo pageInfo = new PageInfo(allBlog);
         model.addAttribute("pageInfo", pageInfo);

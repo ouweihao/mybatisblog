@@ -22,10 +22,10 @@
 
     <select id="findByBlogIdAndParentCommentNull" resultMap="comment">
         select c.id cid,c.nickname,c.email,c.content,c.avatar,
-        c.create_time,c.blog_id,c.parent_comment_id
+        c.create_time,c.blog_id,c.parent_comment_id, c.admincomment
         from t_comment c, t_blog b
         where c.blog_id = b.id and c.blog_id = #{blogId} and c.parent_comment_id = #{blogParentId}
-        order by c.create_time desc
+        order by c.create_time asc
     </select>
 
 
@@ -43,5 +43,11 @@
         from t_comment c
         where c.parent_comment_id = #{parentCommentId}
     </select>
+
+<!--    <select id="findByParentCommentId" resultType="com.ouweihao.pojo.Comment" parameterType="long">-->
+<!--        select *-->
+<!--        from t_comment c-->
+<!--        where c.parent_comment_id = #{parentCommentId}-->
+<!--    </select>-->
 
 </mapper>
