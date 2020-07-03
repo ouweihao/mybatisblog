@@ -46,33 +46,21 @@
 <footer th:fragment="footer" class="ui inverted vertical segment m-padded-tb-massive m-margin-top-huge">
   <div class="ui center aligned container">
     <div class="ui inverted divided stackable grid">
-      <div class="two wide column">
+      <div class="three wide column">
         <div class="ui inverted link list">
           <div class="item">
             <img src="../static/images/wechat.jpg" th:src="@{/images/wechat.jpg}" class="ui rounded image" alt="" style="width: 125px">
           </div>
         </div>
       </div>
-      <div class="four wide column">
-        <h4 class="ui inverted header m-text-thin m-text-spaced">最新文章</h4>
-        <div id="newblog-container">
-          <div class="ui inverted link list" th:fragment="newblogList">
-            <a href="#" th:href="@{/blog/{id}(id=${blog.id})}" target="_blank" class="item m-text-thin" th:each="blog : ${newBlogs}" th:text="${blog.title}">用户故事（User Story）</a>
-            <!--/*-->
-            <a href="#" class="item m-text-thin">用户故事（User Story）</a>
-            <a href="#" class="item m-text-thin">用户故事（User Story）</a>
-            <!--*/-->
-          </div>
-        </div>
-      </div>
-      <div class="four wide column">
+      <div class="five wide column">
         <h4 class="ui inverted header m-text-thin m-text-spaced">联系我</h4>
         <div class="ui inverted link list m-opacity-mini m-text-spaced m-text-thin">
           <a href="#" class="item">邮箱：1804400792@qq.com</a>
           <a href="#" class="item">qq：1804400792</a>
         </div>
       </div>
-      <div class="six wide column">
+      <div class="eight wide column">
         <h4 class="m-opacity-mini m-text-spaced m-text-thin">
           ouweihao温暖の家
         </h4>
@@ -96,9 +84,6 @@
   <script src="../static/lib/tocdoc/tocbot.min.js" th:src="@{/lib/tocdoc/tocbot.min.js}"></script>  <!-- 目录生成 -->
   <script src="../static/lib/qrcode/qrcode.min.js" th:src="@{/lib/qrcode/qrcode.min.js}"></script> <!-- 生成二维码 -->
   <script src="../static/lib/waypoints/jquery.waypoints.min.js" th:src="@{/lib/waypoints/jquery.waypoints.min.js}"></script> <!-- 滚动侦测 -->
-<!--  <script>-->
-<!--    $('#newblog-container').load(/*[[@{/footer/newblog}]]*/"/footer/newblog");-->
-<!--  </script>-->
 </th:block>
 
 </body>

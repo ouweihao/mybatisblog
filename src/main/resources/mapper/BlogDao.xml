@@ -110,7 +110,7 @@
 
     <select id="searchAllBlog" parameterType="com.ouweihao.pojo.Blog" resultMap="blog">
         <bind name="pattern" value="'%' + title + '%'" />    /*模糊查询*/
-        select b.id, b.title, b.update_time, b.recommend, b.published, b.type_id, t.id, t.name typename
+        select b.id, b.title, b.update_time, b.recommend, b.published, b.type_id type_id, t.id, t.name typename
         from t_blog b ,t_type t
         <where>
             <if test="1 == 1">
