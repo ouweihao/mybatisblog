@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import javax.servlet.http.HttpSession;
+import java.util.List;
 
 @Controller
 public class CommentController {
@@ -28,6 +29,10 @@ public class CommentController {
 
     @GetMapping("/comments/{blogId}")  //展示留言
     public String comments(@PathVariable Long blogId, Model model){
+        List<Comment> comments = commentService.getCommentByBlogId(blogId);
+        for (Comment comment : comments) {
+            System.out.println(comment);
+        }
         model.addAttribute("comments", commentService.getCommentByBlogId(blogId));
         model.addAttribute("blog", blogService.getDetailedBlog(blogId));
         return "blog :: commentList";
@@ -36,6 +41,7 @@ public class CommentController {
     @PostMapping("/comments")   //提交留言
     public String post(Comment comment, HttpSession session){
         Long blogId = comment.getBlog().getId();
+        System.out.println(blogId);
         comment.setBlog(blogService.getDetailedBlog(blogId));  //绑定博客与评论
         comment.setBlogId(blogId);
         User user = (User) session.getAttribute("user");

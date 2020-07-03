@@ -50,4 +50,34 @@
 <!--        where c.parent_comment_id = #{parentCommentId}-->
 <!--    </select>-->
 
+    <select id="getCommentByBlogId" parameterType="long" resultMap="comment">
+        select * from t_comment where t_comment.blog_id = #{id} order by create_time asc;
+    </select>
+
+    <select id="findByBlogIdParentIdNull" resultMap="comment">
+        select c.id cid,c.nickname,c.email,c.content,c.avatar,
+        c.create_time create_time,c.blog_id,c.parent_comment_id, c.admincomment
+        from t_comment c
+        where c.blog_id = #{blogId} and c.parent_comment_id = #{blogParentId}
+        order by c.create_time asc
+    </select>
+
+    <!--查询一级子评论-->
+    <select id="findByBlogIdParentIdNotNull" resultMap="comment">
+        select c.id cid,c.nickname,c.email,c.content,c.avatar,
+        c.create_time create_time,c.blog_id,c.parent_comment_id, c.admincomment
+        from t_comment c
+        where c.blog_id = #{blogId} and c.parent_comment_id = #{id}
+        order by c.create_time asc
+    </select>
+
+    <!--查询二级子评论-->
+    <select id="findByBlogIdAndReplayId" resultMap="comment">
+        select c.id cid,c.nickname,c.email,c.content,c.avatar,
+        c.create_time create_time,c.blog_id,c.parent_comment_id, c.admincomment
+        from t_comment c
+        where c.blog_id = #{blogId} and c.parent_comment_id = #{childId}
+        order by c.create_time asc
+    </select>
+
 </mapper>

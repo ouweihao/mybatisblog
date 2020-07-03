@@ -7,6 +7,7 @@ import com.ouweihao.service.CommentService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -21,18 +22,12 @@ public class CommentServiceImpl implements CommentService {
     @Autowired
     private BlogDao blogDao;
 
-    @Override
-    public List<Comment> getCommentByBlogId(Long blogId) {  //查询父评论
-        //没有父节点的默认为-1
-        List<Comment> comments = commentDao.findByBlogIdAndParentCommentNull(blogId, Long.parseLong("-1"));
-        return eachComment(comments);
-    }
-
+    @Transactional
     @Override
     //接收回复的表单
     public int saveComment(Comment comment) {
         //获得父id
-        Long parentCommentId = comment.getParentComment().getId();
+        Long parentCommentId = comment.getParentCommentId();
         //没有父级评论默认是-1
         if (parentCommentId != -1) {
             //有父级评论
@@ -47,59 +42,51 @@ public class CommentServiceImpl implements CommentService {
         return commentDao.saveComment(comment);
     }
 
-    /**
-     * 循环每个顶层评论
-     * @param comments
-     * @return 只有两层深度（顶层和下一层）的评论集合
-     */
-    private List<Comment> eachComment(List<Comment> comments) {
-        List<Comment> commentsViews = new ArrayList<>();
-        for (Comment comment : comments) {
-            Comment c = new Comment();
-            BeanUtils.copyProperties(comment, c);
-            commentsViews.add(c);
-        }
-        // 合并评论中的各子层级到第一层级中
-        combineChildren(commentsViews);
-        return commentsViews;
-    }
-
-    /**
-     * 修改顶层评论的reply集合
-     * @param comments 顶层评论
-     */
-    private void combineChildren(List<Comment> comments) {
-        for (Comment comment : comments) {
-            List<Comment> replyComments = comment.getReplyComments();
-            for (Comment replyComment : replyComments) {
-                // 循环迭代，找出子代，存放到tempReplys中
-                recursively(replyComment);
-            }
-            // 修改顶层评论的reply集合为迭代处理后的集合
-            comment.setReplyComments(tempReplys);
-            // 清空临时存放区
-            tempReplys = new ArrayList<>();
-        }
-    }
-
-    // 存放迭代找出的所有的子代的集合
+    //存放迭代找出的所有子代的集合
     private List<Comment> tempReplys = new ArrayList<>();
 
-    /**
-     * 递归迭代查找回复评论
-     * @param comment 顶级评论
-     */
-    private void recursively(Comment comment) {
-        // 顶层节点添加到临时存放集合中
-        tempReplys.add(comment);
-        if (comment.getReplyComments().size() > 0) {
-            List<Comment> replys = comment.getReplyComments();
-            for (Comment reply : replys) {
-                tempReplys.add(reply);
-                // 递归查找回复评论
-                if (reply.getReplyComments().size() > 0) {
-                    recursively(reply);
-                }
+    @Override
+    public List<Comment> getCommentByBlogId(Long blogId) {
+        //查询出父节点
+        List<Comment> comments = commentDao.findByBlogIdParentIdNull(blogId, Long.parseLong("-1"));
+        for(Comment comment : comments){
+            Long id = comment.getId();
+            String parentNickname1 = comment.getNickname();
+            List<Comment> childComments = commentDao.findByBlogIdParentIdNotNull(blogId,id);
+//            查询出子评论
+            combineChildren(blogId, childComments, parentNickname1);
+            comment.setReplyComments(tempReplys);
+            tempReplys = new ArrayList<>();
+        }
+        return comments;
+    }
+
+    private void combineChildren(Long blogId, List<Comment> childComments, String parentNickname1) {
+//        判断是否有一级子评论
+        if(childComments.size() > 0){
+//                循环找出子评论的id
+            for(Comment childComment : childComments){
+                String parentNickname = childComment.getNickname();
+                childComment.setParentNickname(parentNickname1);
+                tempReplys.add(childComment);
+                Long childId = childComment.getId();
+//                    查询出子二级评论
+                recursively(blogId, childId, parentNickname);
+            }
+        }
+    }
+
+    private void recursively(Long blogId, Long childId, String parentNickname1) {
+//        根据子一级评论的id找到子二级评论
+        List<Comment> replayComments = commentDao.findByBlogIdAndReplayId(blogId,childId);
+
+        if(replayComments.size() > 0){
+            for(Comment replayComment : replayComments){
+                String parentNickname = replayComment.getNickname();
+                replayComment.setParentNickname(parentNickname1);
+                Long replayId = replayComment.getId();
+                tempReplys.add(replayComment);
+                recursively(blogId,replayId,parentNickname);
             }
         }
     }
